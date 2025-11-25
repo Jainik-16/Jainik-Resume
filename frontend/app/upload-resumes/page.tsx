@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
-import { API_AUTH } from "../create-job/page"
+import { axiosConfig, axiosConfigMultipart } from '@/lib/axios-config'
 import {
   Upload,
   FileText,
@@ -57,7 +57,7 @@ export default function ResumeUploader() {
       try {
         const res = await axios.get(
           'http://172.23.88.43:8000/api/resource/Job Opening?fields=["name","job_title","designation","company","location","department"]',
-          API_AUTH,
+          axiosConfig,
         )
         setJobs(res.data.data)
 
@@ -223,10 +223,10 @@ export default function ResumeUploader() {
           formData.append("files", file)
           formData.append("job_opening", selectedJobId)
           // await axios.post("http://localhost:8000/api/method/resume.api.upload_and_process", formData, API_AUTH)
-           await axios.post("http://172.23.88.43:8000/api/method/resume.api.upload_and_process.upload_and_process", formData, API_AUTH)
+          await axios.post("http://172.23.88.43:8000/api/method/resume.api.upload_and_process.upload_and_process", formData, axiosConfigMultipart)
           successfulUploads.push(file.name)
           setProcessedFiles((prev) => [...prev, file.name])
-          
+
           const progress = ((i + 1) / files.length) * 100
           setUploadProgress(progress)
 
@@ -255,9 +255,9 @@ export default function ResumeUploader() {
           className: "bg-green-50 border-green-200",
         })
 
-// Navigate to interview schedule
+        // Navigate to interview schedule
         setTimeout(() => {
-        router.push("/interview")
+          router.push("/interview")
         }, 2000)
 
 
@@ -490,11 +490,10 @@ export default function ResumeUploader() {
                 <form onSubmit={handleUpload} className="space-y-6">
                   {/* Drag & Drop Area */}
                   <div
-                    className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
-                      dragActive
-                        ? "border-emerald-500 bg-emerald-50"
-                        : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50/50"
-                    }`}
+                    className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${dragActive
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-300 hover:border-emerald-400 hover:bg-emerald-50/50"
+                      }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
