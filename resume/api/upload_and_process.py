@@ -76,3 +76,4 @@ def upload_and_process(job_opening=None):
     except Exception as e:
         frappe.log_error(f"Resume upload failed: {e}")
         frappe.throw("Resume upload failed. See error logs.")
+        

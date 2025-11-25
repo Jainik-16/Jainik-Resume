@@ -67,3 +67,4 @@ frappe.ui.form.on('PDF Upload', {
         });
     }
 });
+
