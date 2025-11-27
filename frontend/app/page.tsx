@@ -215,7 +215,7 @@ export default function RecruitmentDashboard() {
             </div>
 
             {/* Workflow Steps */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {workflowSteps.slice(1).map((step, index) => (
                 <div key={step.id} className="relative">
                   <Card
@@ -345,7 +345,7 @@ export default function RecruitmentDashboard() {
               <CardDescription>Jump to any stage of your recruitment process</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {workflowSteps.slice(1).map((step) => (
                   <Link key={step.id} href={step.route || "#"}>
                     <Button

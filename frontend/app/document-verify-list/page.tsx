@@ -1,8 +1,10 @@
+
 "use client"
 import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import {
     Plus,
     Search,
@@ -11,7 +13,12 @@ import {
     Calendar,
     Eye,
     Trash2,
-    Download
+    Download,
+    Mail,
+    Briefcase,
+    CheckCircle2,
+    XCircle,
+    ArrowLeft
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -39,18 +46,12 @@ interface ApplicantDocument {
     }
 }
 
-// const API_AUTH = {
-//     headers: {
-//         Authorization: `token 09481bf19b467f7:39bb84748d00090`,
-//     },
-// }
-import { axiosConfig } from '@/lib/axios-config'
-
 export default function DocumentVerifyListPage() {
     const router = useRouter()
     const [documents, setDocuments] = useState<ApplicantDocument[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
+    const [selectedDoc, setSelectedDoc] = useState<ApplicantDocument | null>(null)
 
     useEffect(() => {
         fetchDocuments()
@@ -71,7 +72,6 @@ export default function DocumentVerifyListPage() {
             const data = await response.json()
 
             if (data && data.data) {
-                // Fetch applicant details for each document
                 const documentsWithDetails = await Promise.all(
                     data.data.map(async (doc: ApplicantDocument) => {
                         if (doc.applicant_name) {
@@ -181,77 +181,88 @@ export default function DocumentVerifyListPage() {
         return count
     }
 
+    const getCompletionPercentage = (doc: ApplicantDocument) => {
+        const total = 8
+        const completed = countDocuments(doc)
+        return Math.round((completed / total) * 100)
+    }
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-lg font-medium text-slate-600">Loading documents...</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-            <div className="container mx-auto p-8 space-y-6">
+            <div className="container mx-auto p-8 space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">
-                            Applicant Documents
+                    <div className="space-y-2">
+                        <div className="flex items-center space-x-4">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => window.history.back()}
+                                className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
+                            >
+                                <ArrowLeft className="h-4 w-4 mr-2" />
+                                Back to Dashboard
+                            </Button>
+                        </div>
+                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                            Document Verification
                         </h1>
-                        <p className="text-muted-foreground">
-                            Manage and verify applicant documentation
-                        </p>
+                        <p className="text-slate-600">Manage and verify applicant documentation</p>
                     </div>
-                    {/* <Button
-                        onClick={() => router.push("/document-verify")}
-                        className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 h-12"
-                    >
-                        <Plus className="h-5 w-5 mr-2" />
-                        Add Document
-                    </Button> */}
                 </div>
 
-                {/* Search Bar */}
-                <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                    <CardContent className="p-6">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                            <Input
-                                placeholder="Search by applicant name, document ID, or employee..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 h-12"
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Stats */}
+                {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-                        <CardContent className="p-6">
+                    <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                        <CardContent className="p-6 relative z-10">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-blue-100 text-sm">Total Documents</p>
-                                    <p className="text-3xl font-bold mt-1">{documents.length}</p>
+                                    <p className="text-blue-100 text-sm font-medium">Total Documents</p>
+                                    <p className="text-4xl font-bold mt-2">{documents.length}</p>
                                 </div>
-                                <FileText className="h-12 w-12 text-blue-200" />
+                                <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
+                                    <FileText className="h-8 w-8" />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
-                        <CardContent className="p-6">
+                    <Card className="border-0 shadow-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                        <CardContent className="p-6 relative z-10">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-indigo-100 text-sm">Applicants</p>
-                                    <p className="text-3xl font-bold mt-1">
+                                    <p className="text-indigo-100 text-sm font-medium">Applicants</p>
+                                    <p className="text-4xl font-bold mt-2">
                                         {new Set(documents.map(d => d.applicant_name)).size}
                                     </p>
                                 </div>
-                                <User className="h-12 w-12 text-indigo-200" />
+                                <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
+                                    <User className="h-8 w-8" />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                        <CardContent className="p-6">
+                    <Card className="border-0 shadow-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                        <CardContent className="p-6 relative z-10">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-purple-100 text-sm">This Month</p>
-                                    <p className="text-3xl font-bold mt-1">
+                                    <p className="text-purple-100 text-sm font-medium">This Month</p>
+                                    <p className="text-4xl font-bold mt-2">
                                         {documents.filter(d => {
                                             const docDate = new Date(d.creation)
                                             const now = new Date()
@@ -260,152 +271,329 @@ export default function DocumentVerifyListPage() {
                                         }).length}
                                     </p>
                                 </div>
-                                <Calendar className="h-12 w-12 text-purple-200" />
+                                <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
+                                    <Calendar className="h-8 w-8" />
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
 
-                {/* Documents List */}
-                {loading ? (
-                    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                        <CardContent className="p-12">
-                            <div className="flex flex-col items-center justify-center space-y-4">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-                                <p className="text-gray-500">Loading documents...</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ) : filteredDocuments.length === 0 ? (
-                    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                        <CardContent className="p-12">
-                            <div className="flex flex-col items-center justify-center space-y-4">
-                                <FileText className="h-16 w-16 text-gray-300" />
-                                <p className="text-gray-500 text-lg">No documents found</p>
-                                <Button
-                                    onClick={() => router.push("/document-verify")}
-                                    variant="outline"
-                                >
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add First Document
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <div className="grid gap-6">
-                        {filteredDocuments.map((doc) => (
-                            <Card
-                                key={doc.name}
-                                className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300"
-                            >
-                                <CardContent className="p-6">
+                {/* Search Card */}
+                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                    <CardContent className="p-6">
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                            <Input
+                                placeholder="Search by applicant name, document ID, or employee..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-12 h-12 border-0 bg-slate-50 focus:bg-white transition-colors"
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Main Content */}
+                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                    {!selectedDoc ? (
+                        <>
+                            <CardHeader className="border-b border-slate-100 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
+                                <CardTitle className="flex items-center space-x-3">
+                                    <div className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg">
+                                        <FileText className="h-5 w-5 text-white" />
+                                    </div>
+                                    <span className="text-xl">All Documents</span>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-6">
+                                {filteredDocuments.length === 0 ? (
+                                    <div className="text-center py-20">
+                                        <div className="inline-block p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full mb-6">
+                                            <FileText className="h-16 w-16 text-blue-400" />
+                                        </div>
+                                        <h3 className="text-xl font-semibold text-slate-800 mb-2">No Documents Found</h3>
+                                        <p className="text-slate-600">No applicant documents available yet.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                        {filteredDocuments.map((doc) => {
+                                            const percentage = getCompletionPercentage(doc)
+                                            return (
+                                                <Card
+                                                    key={doc.name}
+                                                    className="group relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-0 shadow-lg bg-gradient-to-br from-white to-blue-50/30 cursor-pointer"
+                                                    onClick={() => setSelectedDoc(doc)}
+                                                >
+                                                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-600/10 to-indigo-600/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+
+                                                    <CardContent className="p-6 relative z-10">
+                                                        <div className="space-y-4">
+                                                            {/* Header */}
+                                                            <div className="flex items-start justify-between">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-semibold text-lg shadow-lg">
+                                                                        {doc.applicant_details?.applicant_name?.charAt(0).toUpperCase() || "?"}
+                                                                    </div>
+                                                                    <div>
+                                                                        <h3 className="font-bold text-lg text-slate-800 group-hover:text-blue-600 transition-colors">
+                                                                            {doc.applicant_details?.applicant_name || doc.applicant_name}
+                                                                        </h3>
+                                                                        <p className="text-xs text-slate-500">{doc.name}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Progress Bar */}
+                                                            <div className="space-y-2">
+                                                                <div className="flex items-center justify-between text-sm">
+                                                                    <span className="text-slate-600 font-medium">Completion</span>
+                                                                    <span className="font-bold text-slate-800">{percentage}%</span>
+                                                                </div>
+                                                                <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                                                                    <div
+                                                                        className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full transition-all duration-500"
+                                                                        style={{ width: `${percentage}%` }}
+                                                                    ></div>
+                                                                </div>
+                                                                <p className="text-xs text-slate-500">
+                                                                    {countDocuments(doc)} of 8 documents uploaded
+                                                                </p>
+                                                            </div>
+
+                                                            {/* Divider */}
+                                                            <div className="border-t border-slate-200"></div>
+
+                                                            {/* Details */}
+                                                            <div className="space-y-3">
+                                                                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50/50 transition-colors">
+                                                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                                                        <Mail className="h-4 w-4 text-blue-600" />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="text-xs text-slate-500">Email</p>
+                                                                        <p className="font-medium text-sm text-slate-700 truncate">
+                                                                            {doc.applicant_details?.email_id || "N/A"}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50/50 transition-colors">
+                                                                    <div className="p-2 bg-indigo-100 rounded-lg">
+                                                                        <Briefcase className="h-4 w-4 text-indigo-600" />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="text-xs text-slate-500">Employee</p>
+                                                                        <p className="font-medium text-sm text-slate-700 truncate">
+                                                                            {doc.employee_details?.employee_name || "Not Assigned"}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50/50 transition-colors">
+                                                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                                                        <Calendar className="h-4 w-4 text-blue-600" />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="text-xs text-slate-500">Last Modified</p>
+                                                                        <p className="font-medium text-sm text-slate-700">
+                                                                            {formatDate(doc.modified)}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Action Button */}
+                                                            <Button
+                                                                size="sm"
+                                                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    setSelectedDoc(doc)
+                                                                }}
+                                                            >
+                                                                <Eye className="h-4 w-4 mr-2" />
+                                                                View Details
+                                                            </Button>
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </>
+                    ) : (
+                        <>
+                            <CardHeader className="border-b border-slate-100 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="flex items-center space-x-3">
+                                        <div className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg">
+                                            <FileText className="h-5 w-5 text-white" />
+                                        </div>
+                                        <span className="text-xl">Document Details</span>
+                                    </CardTitle>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setSelectedDoc(null)}
+                                        className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
+                                    >
+                                        <ArrowLeft className="h-4 w-4 mr-2" />
+                                        Back to List
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-6 space-y-6">
+                                {/* Applicant Header */}
+                                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6">
                                     <div className="flex items-start justify-between">
-                                        <div className="flex-1 space-y-4">
-                                            {/* Header */}
-                                            <div className="flex items-start justify-between">
-                                                <div>
-                                                    <h3 className="text-xl font-semibold text-gray-900">
-                                                        {doc.applicant_details?.applicant_name || doc.applicant_name}
-                                                    </h3>
-                                                    <p className="text-sm text-gray-500 mt-1">
-                                                        ID: {doc.name}
-                                                    </p>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                                                        {countDocuments(doc)} Documents
-                                                    </span>
-                                                </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                                                {selectedDoc.applicant_details?.applicant_name?.charAt(0).toUpperCase() || "?"}
                                             </div>
-
-                                            {/* Details Grid */}
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                <div>
-                                                    <p className="text-xs text-gray-500">Email</p>
-                                                    <p className="text-sm font-medium text-gray-900 truncate">
-                                                        {doc.applicant_details?.email_id || "N/A"}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-gray-500">Employee</p>
-                                                    <p className="text-sm font-medium text-gray-900 truncate">
-                                                        {doc.employee_details?.employee_name || "Not Assigned"}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-gray-500">Created</p>
-                                                    <p className="text-sm font-medium text-gray-900">
-                                                        {formatDate(doc.creation)}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-gray-500">Modified</p>
-                                                    <p className="text-sm font-medium text-gray-900">
-                                                        {formatDate(doc.modified)}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            {/* Documents Grid */}
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                                {[
-                                                    { label: "Aadhar", value: doc.aadhar_card },
-                                                    { label: "PAN", value: doc.pan },
-                                                    { label: "Passport", value: doc.passport },
-                                                    { label: "Experience", value: doc.experience },
-                                                    { label: "Education", value: doc.education },
-                                                    { label: "Bank Details", value: doc.bank_details },
-                                                    { label: "Medical", value: doc.medical },
-                                                    { label: "Photos", value: doc.photos },
-                                                ].map((item) => (
-                                                    <div
-                                                        key={item.label}
-                                                        className={`px-3 py-2 rounded-lg border ${item.value
-                                                            ? "bg-green-50 border-green-200"
-                                                            : "bg-gray-50 border-gray-200"
-                                                            }`}
-                                                    >
-                                                        <p className="text-xs text-gray-600">{item.label}</p>
-                                                        <p className={`text-xs font-medium mt-1 ${item.value ? "text-green-600" : "text-gray-400"
-                                                            }`}>
-                                                            {item.value ? "✓ Uploaded" : "Missing"}
-                                                        </p>
-                                                    </div>
-                                                ))}
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-slate-800">
+                                                    {selectedDoc.applicant_details?.applicant_name || selectedDoc.applicant_name}
+                                                </h2>
+                                                <p className="text-sm text-slate-500 mt-1">ID: {selectedDoc.name}</p>
                                             </div>
                                         </div>
-
-                                        {/* Actions */}
-                                        {/* <div className="flex flex-col space-y-2 ml-6">
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => window.open(`http://172.23.88.43:8000/app/applicant-document/${doc.name}`, '_blank')}
-                                                className="whitespace-nowrap"
-                                            >
-                                                <Eye className="h-4 w-4 mr-2" />
-                                                View
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="whitespace-nowrap text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                onClick={() => handleDelete(doc.name)}
-                                            >
-                                                <Trash2 className="h-4 w-4 mr-2" />
-                                                Delete
-                                            </Button>
-                                        </div> */}
+                                        <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-sm px-4 py-2">
+                                            {countDocuments(selectedDoc)} / 8 Documents
+                                        </Badge>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
+                                </div>
+
+                                {/* Info Cards */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-white to-blue-50/30">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-3 bg-blue-100 rounded-xl">
+                                                    <Mail className="h-5 w-5 text-blue-600" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs text-slate-500 font-medium">Email Address</p>
+                                                    <p className="text-sm font-semibold text-slate-800 truncate mt-1">
+                                                        {selectedDoc.applicant_details?.email_id || "-"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-white to-indigo-50/30">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-3 bg-indigo-100 rounded-xl">
+                                                    <Briefcase className="h-5 w-5 text-indigo-600" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs text-slate-500 font-medium">Employee</p>
+                                                    <p className="text-sm font-semibold text-slate-800 truncate mt-1">
+                                                        {selectedDoc.employee_details?.employee_name || "Not Assigned"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-white to-blue-50/30">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-3 bg-blue-100 rounded-xl">
+                                                    <Calendar className="h-5 w-5 text-blue-600" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs text-slate-500 font-medium">Created Date</p>
+                                                    <p className="text-sm font-semibold text-slate-800 mt-1">
+                                                        {formatDate(selectedDoc.creation)}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card className="border-0 shadow-md bg-gradient-to-br from-white to-indigo-50/30">
+                                        <CardContent className="p-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-3 bg-indigo-100 rounded-xl">
+                                                    <Calendar className="h-5 w-5 text-indigo-600" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs text-slate-500 font-medium">Modified Date</p>
+                                                    <p className="text-sm font-semibold text-slate-800 mt-1">
+                                                        {formatDate(selectedDoc.modified)}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                {/* Document Status */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg">
+                                            <FileText className="h-5 w-5 text-white" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-800">Document Status</h3>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {[
+                                            { label: "Aadhar Card", value: selectedDoc.aadhar_card, icon: FileText },
+                                            { label: "PAN Card", value: selectedDoc.pan, icon: FileText },
+                                            { label: "Passport", value: selectedDoc.passport, icon: FileText },
+                                            { label: "Experience Letter", value: selectedDoc.experience, icon: Briefcase },
+                                            { label: "Education Certificate", value: selectedDoc.education, icon: FileText },
+                                            { label: "Bank Details", value: selectedDoc.bank_details, icon: FileText },
+                                            { label: "Medical Certificate", value: selectedDoc.medical, icon: FileText },
+                                            { label: "Photos", value: selectedDoc.photos, icon: User },
+                                        ].map((item) => (
+                                            <Card
+                                                key={item.label}
+                                                className={`border-0 shadow-md transition-all ${item.value
+                                                    ? "bg-gradient-to-br from-green-50 to-emerald-50"
+                                                    : "bg-gradient-to-br from-slate-50 to-slate-100"
+                                                    }`}
+                                            >
+                                                <CardContent className="p-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2 rounded-lg ${item.value ? "bg-green-100" : "bg-slate-200"
+                                                                }`}>
+                                                                <item.icon className={`h-4 w-4 ${item.value ? "text-green-600" : "text-slate-400"
+                                                                    }`} />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-semibold text-slate-800">
+                                                                    {item.label}
+                                                                </p>
+                                                                <p className={`text-xs font-medium mt-1 ${item.value ? "text-green-600" : "text-slate-500"
+                                                                    }`}>
+                                                                    {item.value ? "Uploaded" : "Not Uploaded"}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        {item.value ? (
+                                                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                                        ) : (
+                                                            <XCircle className="h-5 w-5 text-slate-400" />
+                                                        )}
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </>
+                    )}
+                </Card>
             </div>
         </div>
     )
 }
-
-
