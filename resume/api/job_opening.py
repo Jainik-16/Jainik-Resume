@@ -137,3 +137,4 @@ def create_job_opening():
             "success": False,
             "message": f"Failed to create job opening: {str(e)}"
         }
+        
