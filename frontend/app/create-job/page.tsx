@@ -826,5 +826,3 @@ export default function CreateJobOpeningForm() {
     </div>
   )
 }
-
-
