@@ -74,6 +74,7 @@ export default function FeedbackPage() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     fetchFeedbackList()
@@ -116,9 +117,19 @@ export default function FeedbackPage() {
     }
   }
 
-  const filteredFeedback = feedbackList.filter(
-    (item) => filterStatus === "all" || item.result.toLowerCase() === filterStatus.toLowerCase()
-  )
+  const filteredFeedback = feedbackList.filter((item) => {
+    const matchesStatus = filterStatus === "all" || item.result.toLowerCase() === filterStatus.toLowerCase()
+
+    const searchLower = searchQuery.toLowerCase()
+    const matchesSearch = searchQuery === "" ||
+      (item.candidate_name || item.applicant?.applicant_name || "").toLowerCase().includes(searchLower) ||
+      (item.applicant?.email_id || "").toLowerCase().includes(searchLower) ||
+      (item.position_applied_for || item.job_opening?.job_title || "").toLowerCase().includes(searchLower) ||
+      (item.interview_round || "").toLowerCase().includes(searchLower) ||
+      (item.interviewer || "").toLowerCase().includes(searchLower)
+
+    return matchesStatus && matchesSearch
+  })
 
   const getResultColor = (result: string) => {
     switch (result?.toLowerCase()) {
@@ -231,6 +242,30 @@ export default function FeedbackPage() {
           </Card>
         )}
 
+        {/* Search Bar */}
+        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <div className="relative">
+              <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by candidate name, email, position, round, or interviewer..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 h-12 border-0 bg-slate-50 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none text-slate-800 placeholder:text-slate-400"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Feedback List */}
           <div className="lg:col-span-2 space-y-4">
@@ -241,139 +276,146 @@ export default function FeedbackPage() {
                   <span>Candidate Feedback ({filteredFeedback.length})</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="p-6">
                 {filteredFeedback.length === 0 ? (
-                  <div className="text-center py-12">
-                    <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="font-semibold mb-2">No Feedback Found</h3>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="text-center py-20">
+                    <div className="inline-block p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full mb-6">
+                      <MessageSquare className="h-16 w-16 text-blue-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-slate-800 mb-2">No Feedback Found</h3>
+                    <p className="text-slate-600">
                       {filterStatus === "all"
                         ? "No feedback records available yet."
                         : `No ${filterStatus} feedback found.`}
                     </p>
                   </div>
                 ) : (
-                  filteredFeedback.map((item) => (
-                    <Card
-                      key={item.name}
-                      className={`cursor-pointer transition-all duration-300 hover:shadow-xl border-0 shadow-lg ${selectedFeedback?.name === item.name ? "ring-2 ring-blue-500" : ""
-                        }`}
-                      onClick={() => setSelectedFeedback(item)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start space-x-4 flex-1">
-                            <Avatar className="h-12 w-12">
-                              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
-                                {(item.candidate_name || item.applicant?.applicant_name || "NA")
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="space-y-2 flex-1">
-                              <div>
-                                <h3 className="font-semibold">{item.candidate_name || item.applicant?.applicant_name || "N/A"}</h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <Mail className="h-3 w-3" />
-                                  <span>{item.applicant?.email_id || "N/A"}</span>
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    {filteredFeedback.map((item) => (
+                      <Card
+                        key={item.name}
+                        className={`group relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-0 shadow-lg bg-gradient-to-br from-white to-blue-50/30 cursor-pointer ${selectedFeedback?.name === item.name ? "ring-2 ring-blue-500" : ""
+                          }`}
+                        onClick={() => setSelectedFeedback(item)}
+                      >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-600/10 to-indigo-600/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+
+                        <CardContent className="p-6 relative z-10">
+                          <div className="space-y-4">
+                            {/* Header with Avatar and Status */}
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-semibold text-lg shadow-lg">
+                                  {(item.candidate_name || item.applicant?.applicant_name || "NA")
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                </div>
+                                <div>
+                                  <h3 className="font-bold text-lg text-slate-800 group-hover:text-blue-600 transition-colors">
+                                    {item.candidate_name || item.applicant?.applicant_name || "N/A"}
+                                  </h3>
+                                  <p className="text-xs text-slate-500">{item.name}</p>
                                 </div>
                               </div>
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <Briefcase className="h-3 w-3" />
-                                  <span className="font-medium">{item.position_applied_for || item.job_opening?.job_title || "N/A"}</span>
+                              <Badge className={`${getResultColor(item.result)} shadow-sm`}>
+                                {item.result || "Pending"}
+                              </Badge>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="border-t border-slate-200"></div>
+
+                            {/* Details */}
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50/50 transition-colors">
+                                <div className="p-2 bg-blue-100 rounded-lg">
+                                  <Mail className="h-4 w-4 text-blue-600" />
                                 </div>
-                                {item.new_position && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <TrendingUp className="h-3 w-3 text-blue-600" />
-                                    <span className="text-blue-600 font-medium">New: {item.new_position}</span>
-                                  </div>
-                                )}
-                                {item.replacement_position && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <UserCheck className="h-3 w-3 text-purple-600" />
-                                    <span className="text-purple-600">Replacement: {item.replacement_position}</span>
-                                  </div>
-                                )}
-                                {(item.location || item.job_opening?.location) && (
-                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <MapPin className="h-3 w-3" />
-                                    <span>{item.location || item.job_opening?.location}</span>
-                                  </div>
-                                )}
-                                {(item.applicant?.country) && (
-                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Globe className="h-3 w-3" />
-                                    <span>{item.applicant.country}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                                <span>{item.interview_round || "N/A"}</span>
-                                <span>•</span>
-                                <div className="flex items-center space-x-1">
-                                  <Calendar className="h-3 w-3" />
-                                  <span>{formatDate(item.interview_date || item.creation)}</span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-slate-500">Email</p>
+                                  <p className="font-medium text-sm text-slate-700 truncate">
+                                    {item.applicant?.email_id || "N/A"}
+                                  </p>
                                 </div>
                               </div>
-                              {item.applicant_rating && (
-                                <div className="pt-2">
-                                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                                    <Award className="h-3 w-3 mr-1" />
-                                    {item.applicant_rating}
-                                  </Badge>
+
+                              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50/50 transition-colors">
+                                <div className="p-2 bg-indigo-100 rounded-lg">
+                                  <Briefcase className="h-4 w-4 text-indigo-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-slate-500">Position</p>
+                                  <p className="font-medium text-sm text-slate-700 truncate">
+                                    {item.position_applied_for || item.job_opening?.job_title || "N/A"}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-50/50 transition-colors">
+                                <div className="p-2 bg-blue-100 rounded-lg">
+                                  <Calendar className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-slate-500">Interview Round</p>
+                                  <p className="font-medium text-sm text-slate-700">
+                                    {item.interview_round || "N/A"}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {item.average_rating > 0 && (
+                                <div className="flex items-center gap-3 p-2 rounded-lg bg-amber-50/50">
+                                  <div className="p-2 bg-amber-100 rounded-lg">
+                                    <Star className="h-4 w-4 text-amber-600" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <p className="text-xs text-slate-500">Average Rating</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <StarRating rating={Math.round(item.average_rating)} />
+                                      <span className="text-xs text-slate-600">
+                                        {item.average_rating.toFixed(1)} ({item.total_skills} skills)
+                                      </span>
+                                    </div>
+                                  </div>
                                 </div>
                               )}
                             </div>
-                          </div>
-                          <div className="text-right space-y-2">
-                            <Badge className={getResultColor(item.result)}>{item.result || "Pending"}</Badge>
-                            {item.average_rating > 0 && (
-                              <div className="text-sm">
-                                <StarRating rating={Math.round(item.average_rating)} />
-                                <div className="text-xs text-muted-foreground mt-1">
-                                  {item.average_rating.toFixed(1)} avg ({item.total_skills} skills)
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center mt-3 pt-3 border-t">
-                          {/* Left side button */}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="gap-2"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              // Add your action here
-                              router.push("/document-verify")
-                            }}
-                          >
-                            <FileText className="h-4 w-4" />
-                            Document Verify
-                          </Button>
 
-                          {/* Right side button */}
-                          {item.result === "Cleared" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="gap-2"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                router.push("/offer-letter")
-                              }}
-                            >
-                              <FileText className="h-4 w-4" />
-                              Offer Letter
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
+                            {/* Action Buttons */}
+                            <div className="flex gap-2 pt-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  router.push("/document-verify")
+                                }}
+                              >
+                                <FileText className="h-4 w-4 mr-2" />
+                                Documents
+                              </Button>
+
+                              {item.result === "Cleared" && (
+                                <Button
+                                  size="sm"
+                                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    router.push("/offer-letter")
+                                  }}
+                                >
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Offer Letter
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -623,4 +665,3 @@ export default function FeedbackPage() {
     </div>
   )
 }
-

@@ -284,12 +284,21 @@ export default function DocumentVerifyListPage() {
                     <CardContent className="p-6">
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                            <Input
+                            <input
+                                type="text"
                                 placeholder="Search by applicant name, document ID, or employee..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-12 h-12 border-0 bg-slate-50 focus:bg-white transition-colors"
+                                className="w-full pl-12 pr-4 h-12 border-0 bg-slate-50 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none text-slate-800 placeholder:text-slate-400"
                             />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery("")}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                    ✕
+                                </button>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

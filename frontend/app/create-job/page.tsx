@@ -208,6 +208,18 @@ export default function CreateJobOpeningForm() {
           })
           return false
         }
+
+        // Add this validation for closes_on
+        if (formData.closes_on && formData.closes_on <= formData.posted_on) {
+          toast({
+            variant: "destructive",
+            title: "Invalid Application Deadline",
+            description: "Application deadline must be after the posting date.",
+            duration: 4000,
+          })
+          return false
+        }
+
         return true
       default:
         return true
@@ -239,10 +251,18 @@ export default function CreateJobOpeningForm() {
       duration: 2000,
     })
 
+    // const payload = {
+    //   ...formData,
+    //   lower_range: formData.lower_range ? Number.parseFloat(formData.lower_range) : undefined,
+    //   upper_range: formData.upper_range ? Number.parseFloat(formData.upper_range) : undefined,
+    //   status: formData.status,
+    //   salary_per: formData.salary_per,
+    // }
     const payload = {
       ...formData,
       lower_range: formData.lower_range ? Number.parseFloat(formData.lower_range) : undefined,
       upper_range: formData.upper_range ? Number.parseFloat(formData.upper_range) : undefined,
+      closes_on: formData.closes_on || undefined, // Add this line - don't send empty string
       status: formData.status,
       salary_per: formData.salary_per,
     }
@@ -440,6 +460,7 @@ export default function CreateJobOpeningForm() {
                   onChange={handleChange}
                   type="date"
                   className="h-12"
+                  min={formData.posted_on}
                 />
               </div>
             </div>

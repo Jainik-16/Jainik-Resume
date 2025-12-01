@@ -9,7 +9,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Checkbox } from "@/components/ui/checkbox"
-import { UserCheck, Send, Download, ArrowLeft, Calendar, FileText, Plus, Trash2, AlertCircle } from "lucide-react"
+// import { UserCheck, Send, Download, ArrowLeft, Calendar, FileText, Plus, Trash2, AlertCircle } from "lucide-react"
+import {
+  UserCheck,
+  Send,
+  Download,
+  ArrowLeft,
+  Calendar,
+  FileText,
+  Plus,
+  Trash2,
+  AlertCircle,
+  CheckCircle2,
+  User,
+  Building2,
+  Briefcase
+} from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface AcceptedCandidate {
@@ -648,35 +663,47 @@ export default function AppointmentPage() {
                       </CardContent>
                     </Card>
 
-                    <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-                      <CardHeader>
-                        <CardTitle>Appointment Details</CardTitle>
+                    <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+                      <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5 text-blue-600" />
+                          Appointment Details
+                        </CardTitle>
                         <CardDescription>Fill in the appointment letter details</CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <CardContent className="space-y-6 pt-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="job_applicant">Job Applicant</Label>
+                            <Label htmlFor="job_applicant" className="flex items-center gap-2">
+                              <User className="h-4 w-4 text-blue-500" />
+                              Job Applicant
+                            </Label>
                             <Input
                               id="job_applicant"
                               value={selectedCandidate.applicant_name}
                               disabled
-                              className="bg-gray-50"
+                              className="bg-gray-50 h-11 shadow-sm"
                             />
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="company">Company</Label>
+                            <Label htmlFor="company" className="flex items-center gap-2">
+                              <Building2 className="h-4 w-4 text-blue-500" />
+                              Company
+                            </Label>
                             <Input
                               id="company"
                               value={appointmentDetails.company}
                               disabled
-                              className="bg-gray-50"
+                              className="bg-gray-50 h-11 shadow-sm"
                             />
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="appointment_date">Appointment Date *</Label>
+                            <Label htmlFor="appointment_date" className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-blue-500" />
+                              Appointment Date <span className="text-red-500">*</span>
+                            </Label>
                             <Input
                               id="appointment_date"
                               type="date"
@@ -685,16 +712,20 @@ export default function AppointmentPage() {
                                 setAppointmentDetails({ ...appointmentDetails, appointment_date: e.target.value })
                               }
                               required
+                              className="h-11 shadow-sm"
                             />
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor="template">Appointment Letter Template *</Label>
+                            <Label htmlFor="template" className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-blue-500" />
+                              Appointment Letter Template <span className="text-red-500">*</span>
+                            </Label>
                             <Select
                               value={appointmentDetails.appointment_letter_template}
                               onValueChange={handleTemplateSelect}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger className="h-11 shadow-sm">
                                 <SelectValue placeholder="Select template" />
                               </SelectTrigger>
                               <SelectContent>
@@ -705,11 +736,20 @@ export default function AppointmentPage() {
                                 ))}
                               </SelectContent>
                             </Select>
+                            {appointmentDetails.appointment_letter_template && (
+                              <p className="text-xs text-blue-600 flex items-center gap-1">
+                                <CheckCircle2 className="h-3 w-3" />
+                                Template loaded successfully
+                              </p>
+                            )}
                           </div>
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="introduction">Introduction</Label>
+                          <Label htmlFor="introduction" className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-blue-500" />
+                            Introduction
+                          </Label>
                           <Textarea
                             id="introduction"
                             value={appointmentDetails.introduction}
@@ -718,11 +758,15 @@ export default function AppointmentPage() {
                             }
                             placeholder="Introduction text..."
                             rows={3}
+                            className="shadow-sm"
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="closing_notes">Closing Notes</Label>
+                          <Label htmlFor="closing_notes" className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-blue-500" />
+                            Closing Notes
+                          </Label>
                           <Textarea
                             id="closing_notes"
                             value={appointmentDetails.closing_notes}
@@ -731,55 +775,68 @@ export default function AppointmentPage() {
                             }
                             placeholder="Closing notes..."
                             rows={3}
+                            className="shadow-sm"
                           />
                         </div>
 
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <Label>Terms</Label>
-                            <Button onClick={handleAddTerm} size="sm" variant="outline">
+                            <Label className="flex items-center gap-2">
+                              <FileText className="h-4 w-4 text-blue-500" />
+                              Terms & Conditions
+                              {appointmentDetails.terms.length > 0 && (
+                                <Badge className="ml-2 bg-blue-100 text-blue-800 border-blue-200">
+                                  {appointmentDetails.terms.length} term{appointmentDetails.terms.length !== 1 ? 's' : ''}
+                                </Badge>
+                              )}
+                            </Label>
+                            <Button
+                              onClick={handleAddTerm}
+                              size="sm"
+                              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md"
+                            >
                               <Plus className="h-4 w-4 mr-2" />
                               Add Term
                             </Button>
                           </div>
 
                           {appointmentDetails.terms.length > 0 ? (
-                            <div className="border rounded-lg overflow-hidden">
+                            <div className="border rounded-lg overflow-hidden shadow-sm">
                               <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
                                   <tr>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">No.</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Title</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Description</th>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Action</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-16">No.</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Title</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-24">Action</th>
                                   </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-gray-100">
                                   {appointmentDetails.terms.map((term, index) => (
-                                    <tr key={index} className="border-t">
-                                      <td className="px-4 py-2 text-sm">{index + 1}</td>
-                                      <td className="px-4 py-2">
+                                    <tr key={index} className="hover:bg-blue-50/50 transition-colors">
+                                      <td className="px-4 py-3 text-sm font-medium text-gray-500">{index + 1}</td>
+                                      <td className="px-4 py-3">
                                         <Input
                                           value={term.title}
                                           onChange={(e) => handleTermChange(index, "title", e.target.value)}
-                                          placeholder="Title"
-                                          className="text-sm"
+                                          placeholder="e.g., Probation Period"
+                                          className="text-sm h-10 shadow-sm"
                                         />
                                       </td>
-                                      <td className="px-4 py-2">
+                                      <td className="px-4 py-3">
                                         <Input
                                           value={term.description}
                                           onChange={(e) => handleTermChange(index, "description", e.target.value)}
-                                          placeholder="Description"
-                                          className="text-sm"
+                                          placeholder="e.g., 6 months from date of joining"
+                                          className="text-sm h-10 shadow-sm"
                                         />
                                       </td>
-                                      <td className="px-4 py-2">
+                                      <td className="px-4 py-3">
                                         <Button
                                           onClick={() => handleRemoveTerm(index)}
                                           size="sm"
                                           variant="ghost"
-                                          className="text-red-500 hover:text-red-700"
+                                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                         >
                                           <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -790,26 +847,37 @@ export default function AppointmentPage() {
                               </table>
                             </div>
                           ) : (
-                            <p className="text-sm text-muted-foreground text-center py-4 bg-gray-50 rounded">
-                              No terms added yet. Select a template or add manually.
-                            </p>
+                            <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                              <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                              <p className="text-sm font-medium text-gray-600">No terms added yet</p>
+                              <p className="text-xs text-gray-500 mt-1">Select a template or add terms manually</p>
+                            </div>
                           )}
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
                           <Button
                             type="button"
                             onClick={handleCreateAppointment}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white h-11 shadow-lg hover:shadow-xl transition-all"
                             disabled={loading || !appointmentDetails.appointment_date || !appointmentDetails.appointment_letter_template}
                           >
-                            <FileText className="h-4 w-4 mr-2" />
-                            {loading ? "Saving..." : "Save Appointment Letter"}
+                            {loading ? (
+                              <span className="flex items-center gap-2">
+                                <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Saving...
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4" />
+                                Save Appointment Letter
+                              </span>
+                            )}
                           </Button>
                           <Button
                             type="button"
                             variant="outline"
-                            className="flex-1"
+                            className="flex-1 h-11 shadow-sm"
                             disabled
                           >
                             <Download className="h-4 w-4 mr-2" />
@@ -817,7 +885,7 @@ export default function AppointmentPage() {
                           </Button>
                           <Button
                             type="button"
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white h-11 shadow-md"
                             disabled
                           >
                             <Send className="h-4 w-4 mr-2" />

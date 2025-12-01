@@ -7,7 +7,27 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import { Settings, Star, Trash2, Copy, ArrowLeft, Plus, RefreshCw, Eye } from "lucide-react"
+// import { Settings, Star, Trash2, Copy, ArrowLeft, Plus, RefreshCw, Eye } from "lucide-react"
+import {
+  Settings,
+  Star,
+  Trash2,
+  Copy,
+  ArrowLeft,
+  Plus,
+  RefreshCw,
+  Eye,
+  User,
+  Briefcase,
+  Calendar,
+  FileText,
+  Building2,
+  MapPin,
+  CheckCircle2,
+  AlertCircle,
+  MessageSquare,
+  Mail
+} from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 const API_MODULE_PATH = "resume.api.interview_feedback"
@@ -620,6 +640,7 @@ export default function CandidateFeedbackPage() {
       return
     }
 
+
     setIsSaving(true)
     try {
       const formData = new URLSearchParams()
@@ -859,37 +880,50 @@ export default function CandidateFeedbackPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="container mx-auto p-8 space-y-8">
+      <div className="container mx-auto p-6 lg:p-8 space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" onClick={() => router.push('/feedback')}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push('/feedback')}
+                className="shadow-sm hover:shadow-md transition-shadow"
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to List
+                Back
               </Button>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 New Interview Feedback
               </h1>
             </div>
-            <p className="text-muted-foreground">Provide detailed feedback for candidate interviews</p>
+            <p className="text-sm text-muted-foreground ml-[92px]">Provide detailed feedback for candidate interviews</p>
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto relative">
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="border-b">
-              <CardTitle>Details</CardTitle>
+        <div className="max-w-5xl mx-auto space-y-6">
+          {/* Main Details Card */}
+          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+            <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5 text-blue-600" />
+                Interview Details
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-6">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Interview <span className="text-red-500">*</span></Label>
+                  <Label className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-blue-500" />
+                    Interview <span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     value={feedbackForm.interview}
                     onValueChange={handleInterviewChange}
                     disabled={loading.interviews}
                   >
-                    <SelectTrigger className="h-12">
+                    <SelectTrigger className="h-11 shadow-sm">
                       <SelectValue placeholder={
                         loading.interviews ? "Loading..." :
                           interviews.length === 0 ? "No interviews found" :
@@ -907,13 +941,16 @@ export default function CandidateFeedbackPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Interviewer <span className="text-red-500">*</span></Label>
+                  <Label className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-blue-500" />
+                    Interviewer <span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     value={feedbackForm.interviewer}
                     onValueChange={(value) => setFeedbackForm({ ...feedbackForm, interviewer: value })}
                     disabled={loading.interviewers}
                   >
-                    <SelectTrigger className="h-12">
+                    <SelectTrigger className="h-11 shadow-sm">
                       <SelectValue placeholder={
                         loading.interviewers ? "Loading..." :
                           interviewers.length === 0 ? "No interviewers found" :
@@ -932,107 +969,137 @@ export default function CandidateFeedbackPage() {
               </div>
 
               {feedbackForm.job_applicant && (
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label>Job Applicant</Label>
+                    <Label className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4 text-blue-500" />
+                      Job Applicant
+                    </Label>
                     <Input
                       value={feedbackForm.job_applicant}
                       disabled
-                      className="bg-gray-50 h-12"
+                      className="bg-gray-50 h-11 shadow-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Interview Round</Label>
+                    <Label className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-blue-500" />
+                      Interview Round
+                    </Label>
                     <Input
                       value={feedbackForm.interview_round}
                       disabled
-                      className="bg-gray-50 h-12"
+                      className="bg-gray-50 h-11 shadow-sm"
                     />
                   </div>
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Candidate Name</Label>
+                  <Label className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-blue-500" />
+                    Candidate Name
+                  </Label>
                   <Input
                     value={feedbackForm.candidate_name}
                     onChange={(e) => setFeedbackForm({ ...feedbackForm, candidate_name: e.target.value })}
                     placeholder="Enter candidate name"
-                    className="h-12"
+                    className="h-11 shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Interview Date</Label>
+                  <Label className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-blue-500" />
+                    Interview Date
+                  </Label>
                   <Input
                     type="date"
                     value={feedbackForm.interview_date}
                     onChange={(e) => setFeedbackForm({ ...feedbackForm, interview_date: e.target.value })}
-                    className="h-12"
+                    className="h-11 shadow-sm"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Position Applied For</Label>
+                  <Label className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-blue-500" />
+                    Position Applied For
+                  </Label>
                   <Input
                     value={feedbackForm.position_applied_for}
                     disabled
                     placeholder="Auto-populated from Job Opening"
-                    className="bg-gray-100 h-12 text-gray-700"
+                    className="bg-gray-100 h-11 text-gray-700 shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Department</Label>
+                  <Label className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-blue-500" />
+                    Department
+                  </Label>
                   <Input
                     value={feedbackForm.department}
                     disabled
                     placeholder="Auto-populated from Job Opening"
-                    className="bg-gray-100 h-12 text-gray-700"
+                    className="bg-gray-100 h-11 text-gray-700 shadow-sm"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Location</Label>
+                  <Label className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-blue-500" />
+                    Location
+                  </Label>
                   <Input
                     value={feedbackForm.location}
                     disabled
                     placeholder="Auto-populated from Job Opening"
-                    className="bg-gray-100 h-12 text-gray-700"
+                    className="bg-gray-100 h-11 text-gray-700 shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>New Position</Label>
+                  <Label className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-blue-500" />
+                    New Position
+                  </Label>
                   <Input
                     value={feedbackForm.new_position}
                     onChange={(e) => setFeedbackForm({ ...feedbackForm, new_position: e.target.value })}
                     placeholder="Enter new position"
-                    className="h-12"
+                    className="h-11 shadow-sm"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Replacement Position</Label>
+                <Label className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4 text-blue-500" />
+                  Replacement Position
+                </Label>
                 <Input
                   value={feedbackForm.replacement_position}
                   onChange={(e) => setFeedbackForm({ ...feedbackForm, replacement_position: e.target.value })}
                   placeholder="Enter replacement position"
-                  className="h-12"
+                  className="h-11 shadow-sm"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Result <span className="text-red-500">*</span></Label>
+                <Label className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-blue-500" />
+                  Result <span className="text-red-500">*</span>
+                </Label>
                 <Select
                   value={feedbackForm.result}
                   onValueChange={(value) => setFeedbackForm({ ...feedbackForm, result: value })}
                   disabled={loading.resultOptions}
                 >
-                  <SelectTrigger className="h-12">
+                  <SelectTrigger className="h-11 shadow-sm">
                     <SelectValue placeholder={
                       loading.resultOptions ? "Loading..." :
                         resultOptions.length === 0 ? "No options available" :
@@ -1051,73 +1118,55 @@ export default function CandidateFeedbackPage() {
             </CardContent>
           </Card>
 
-          <Card className="mt-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="border-b">
+          {/* Skill Assessment Card */}
+          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+            <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
               <div className="flex items-center justify-between">
-                <CardTitle>Skill Assessment</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowColumnConfig(true)}
-                    className="h-9 w-9 p-0"
-                  >
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                </div>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-blue-600" />
+                  Skill Assessment
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowColumnConfig(true)}
+                  className="h-9 w-9 p-0 hover:bg-blue-100"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
               </div>
             </CardHeader>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+                  <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b sticky top-0">
                     <tr>
-                      <th className="text-left p-4 text-sm font-medium w-16">
+                      <th className="text-left p-4 w-16 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         <input type="checkbox" className="rounded" />
                       </th>
-                      <th className="text-left p-4 text-sm font-medium w-20">No.</th>
-                      <th className="text-left p-4 text-sm font-medium">
+                      <th className="text-left p-4 w-20 text-xs font-semibold text-gray-700 uppercase tracking-wider">No.</th>
+                      <th className="text-left p-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         Skill <span className="text-red-500">*</span>
                       </th>
-                      <th className="text-left p-4 text-sm font-medium">
+                      <th className="text-left p-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         Rating <span className="text-red-500">*</span>
                       </th>
                       <th className="w-12 p-4"></th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-100">
                     {skillAssessments.map((skill, index) => (
                       <React.Fragment key={skill.id}>
-                        <tr className="border-b hover:bg-blue-50/50 transition-colors">
+                        <tr className="hover:bg-blue-50/50 transition-colors">
                           <td className="p-4">
                             <input type="checkbox" className="rounded" />
                           </td>
-                          <td className="p-4 text-gray-600">{index + 1}</td>
+                          <td className="p-4 text-sm text-gray-500 font-medium">{index + 1}</td>
                           <td className="p-4">
-                            {/* <Select
-                              value={skill.skill}
-                              onValueChange={(value) => updateSkillAssessment(skill.id, 'skill', value)}
-                              disabled={loading.skills}
-                            >
-                              <SelectTrigger className="border-0 focus:ring-1 h-12">
-                                <SelectValue placeholder={
-                                  loading.skills ? "Loading skills..." :
-                                    availableSkills.length === 0 ? "No skills available" :
-                                      "Select a skill"
-                                } />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {availableSkills.map((skillName) => (
-                                  <SelectItem key={skillName} value={skillName}>
-                                    {skillName}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select> */}
                             <Input
                               value={skill.skill}
                               disabled
-                              className="border-0 bg-gray-50 h-12"
+                              className="border-0 bg-gray-50 h-10 shadow-sm"
                             />
                           </td>
                           <td className="p-4">
@@ -1131,7 +1180,7 @@ export default function CandidateFeedbackPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => setEditingRowId(editingRowId === skill.id ? null : skill.id)}
-                              className="h-8 w-8 p-0"
+                              className="h-8 w-8 p-0 hover:bg-blue-100"
                             >
                               ✏️
                             </Button>
@@ -1142,7 +1191,7 @@ export default function CandidateFeedbackPage() {
                             <td colSpan={5} className="bg-blue-50/50 border-b">
                               <div className="p-4">
                                 <div className="flex items-center justify-between mb-3">
-                                  <h3 className="font-semibold">Editing Row #{index + 1}</h3>
+                                  <h3 className="font-semibold text-gray-900">Editing Row #{index + 1}</h3>
                                 </div>
                                 <div className="mb-4">
                                   <Label className="mb-2 block">Rating <span className="text-red-500">*</span></Label>
@@ -1161,31 +1210,29 @@ export default function CandidateFeedbackPage() {
                   </tbody>
                 </table>
               </div>
-              {/* <div className="p-4 border-t">
-                <Button
-                  variant="link"
-                  onClick={addSkillRow}
-                  className="text-blue-600 p-0"
-                >
-                  Add Row
-                </Button>
-              </div> */}
             </CardContent>
           </Card>
 
-          <Card className="mt-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="border-b">
-              <CardTitle>Applicant Rating</CardTitle>
+          {/* Applicant Rating Card */}
+          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+            <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+              <CardTitle className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-blue-600" />
+                Applicant Rating
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-2">
-                <Label>Overall Rating</Label>
+                <Label className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-blue-500" />
+                  Overall Rating
+                </Label>
                 <Select
                   value={feedbackForm.applicant_rating}
                   onValueChange={(value) => setFeedbackForm({ ...feedbackForm, applicant_rating: value })}
                   disabled={loading.applicantRatingOptions}
                 >
-                  <SelectTrigger className="h-12">
+                  <SelectTrigger className="h-11 shadow-sm">
                     <SelectValue placeholder={
                       loading.applicantRatingOptions ? "Loading ratings..." :
                         applicantRatingOptions.length === 0 ? "No ratings available" :
@@ -1204,20 +1251,24 @@ export default function CandidateFeedbackPage() {
             </CardContent>
           </Card>
 
-          <Card className="mt-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="border-b">
-              <CardTitle>Final Score & Recommendation</CardTitle>
+          {/* Final Score & Recommendation Card */}
+          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+            <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                Final Score & Recommendation
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
-              <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg mb-4">
-                <span className="text-lg font-semibold">Total Score:</span>
+              <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg mb-4 border border-blue-200">
+                <span className="text-lg font-semibold text-gray-900">Total Score:</span>
                 <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   {calculateTotalScore()} / 40
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {["Average (10 to 13)", "Good (14 to 18)", "Excellent (19 to 21)"].map((option) => (
-                  <div key={option} className="flex items-center space-x-2">
+                  <div key={option} className="flex items-center space-x-2 p-2 rounded hover:bg-blue-50 transition-colors">
                     <input
                       type="checkbox"
                       id={`final-score-${option}`}
@@ -1225,12 +1276,12 @@ export default function CandidateFeedbackPage() {
                       disabled
                       className="rounded"
                     />
-                    <label htmlFor={`final-score-${option}`} className="text-sm">
+                    <label htmlFor={`final-score-${option}`} className="text-sm font-medium">
                       {option}
                     </label>
                   </div>
                 ))}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 p-2 rounded hover:bg-blue-50 transition-colors">
                   <input
                     type="checkbox"
                     id="final-score-To be Offered"
@@ -1248,13 +1299,13 @@ export default function CandidateFeedbackPage() {
                         })
                       }
                     }}
-                    className="rounded"
+                    className="rounded cursor-pointer"
                   />
-                  <label htmlFor="final-score-To be Offered" className="text-sm cursor-pointer">
+                  <label htmlFor="final-score-To be Offered" className="text-sm cursor-pointer font-medium">
                     To be Offered
                   </label>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 p-2 rounded hover:bg-blue-50 transition-colors">
                   <input
                     type="checkbox"
                     id="final-score-Not Shortlisted"
@@ -1272,13 +1323,13 @@ export default function CandidateFeedbackPage() {
                         })
                       }
                     }}
-                    className="rounded"
+                    className="rounded cursor-pointer"
                   />
-                  <label htmlFor="final-score-Not Shortlisted" className="text-sm cursor-pointer">
+                  <label htmlFor="final-score-Not Shortlisted" className="text-sm cursor-pointer font-medium">
                     Not Shortlisted
                   </label>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 p-2 rounded hover:bg-blue-50 transition-colors">
                   <input
                     type="checkbox"
                     id="final-score-Candidature Withdrawn"
@@ -1296,9 +1347,9 @@ export default function CandidateFeedbackPage() {
                         })
                       }
                     }}
-                    className="rounded"
+                    className="rounded cursor-pointer"
                   />
-                  <label htmlFor="final-score-Candidature Withdrawn" className="text-sm cursor-pointer">
+                  <label htmlFor="final-score-Candidature Withdrawn" className="text-sm cursor-pointer font-medium">
                     Candidature Withdrawn
                   </label>
                 </div>
@@ -1306,15 +1357,19 @@ export default function CandidateFeedbackPage() {
             </CardContent>
           </Card>
 
+          {/* Conditional: Not Shortlisted Reason */}
           {showNotShortlistedSection && (
-            <Card className="mt-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader className="border-b">
-                <CardTitle>Not Shortlisted Reason</CardTitle>
+            <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+              <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-orange-600" />
+                  Not Shortlisted Reason
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   {notShortlistedOptions.map((option) => (
-                    <div key={option} className="flex items-center space-x-2">
+                    <div key={option} className="flex items-center space-x-2 p-2 rounded hover:bg-orange-50 transition-colors">
                       <input
                         type="checkbox"
                         id={`not-shortlisted-${option}`}
@@ -1332,9 +1387,9 @@ export default function CandidateFeedbackPage() {
                             })
                           }
                         }}
-                        className="rounded"
+                        className="rounded cursor-pointer"
                       />
-                      <label htmlFor={`not-shortlisted-${option}`} className="text-sm cursor-pointer">
+                      <label htmlFor={`not-shortlisted-${option}`} className="text-sm cursor-pointer font-medium">
                         {option}
                       </label>
                     </div>
@@ -1344,15 +1399,19 @@ export default function CandidateFeedbackPage() {
             </Card>
           )}
 
+          {/* Conditional: Withdrawn Reason */}
           {showWithdrawnSection && (
-            <Card className="mt-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader className="border-b">
-                <CardTitle>Withdrawn Reason</CardTitle>
+            <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+              <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                  Withdrawn Reason
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   {withdrawnReasonOptions.map((option) => (
-                    <div key={option} className="flex items-center space-x-2">
+                    <div key={option} className="flex items-center space-x-2 p-2 rounded hover:bg-red-50 transition-colors">
                       <input
                         type="checkbox"
                         id={`withdrawn-${option}`}
@@ -1370,9 +1429,9 @@ export default function CandidateFeedbackPage() {
                             })
                           }
                         }}
-                        className="rounded"
+                        className="rounded cursor-pointer"
                       />
-                      <label htmlFor={`withdrawn-${option}`} className="text-sm cursor-pointer">
+                      <label htmlFor={`withdrawn-${option}`} className="text-sm cursor-pointer font-medium">
                         {option}
                       </label>
                     </div>
@@ -1382,54 +1441,76 @@ export default function CandidateFeedbackPage() {
             </Card>
           )}
 
-          <Card className="mt-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="border-b">
-              <CardTitle>Remarks</CardTitle>
+          {/* Remarks Card */}
+          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+            <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-600" />
+                Remarks
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-2">
-                <Label>Description</Label>
+                <Label className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-blue-500" />
+                  Description
+                </Label>
                 <Textarea
                   value={feedbackForm.remarks}
                   onChange={(e) => setFeedbackForm({ ...feedbackForm, remarks: e.target.value })}
                   placeholder="Enter remarks..."
-                  className="min-h-[150px]"
+                  className="min-h-[150px] shadow-sm"
                   rows={6}
                 />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="mt-6 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="border-b">
-              <CardTitle>Feedback</CardTitle>
+          {/* Feedback Card */}
+          <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-sm">
+            <CardHeader className="border-b bg-gradient-to-r from-slate-50 to-blue-50">
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-blue-600" />
+                Detailed Feedback
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <Textarea
                 value={feedbackForm.feedback}
                 onChange={(e) => setFeedbackForm({ ...feedbackForm, feedback: e.target.value })}
                 placeholder="Enter detailed feedback about the candidate's performance..."
-                className="min-h-[150px]"
+                className="min-h-[150px] shadow-sm"
                 rows={6}
               />
             </CardContent>
           </Card>
 
-          <div className="mt-6 flex justify-end gap-3">
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3 pt-2">
             <Button
               variant="outline"
               onClick={() => router.push('/feedback')}
               disabled={isSaving}
-              className="px-8 h-12"
+              className="px-6 h-11 shadow-sm"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 h-12"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 h-11 shadow-lg hover:shadow-xl transition-all"
             >
-              {isSaving ? "Saving..." : "Save"}
+              {isSaving ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Saving...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Save Feedback
+                </span>
+              )}
             </Button>
           </div>
         </div>

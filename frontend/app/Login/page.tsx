@@ -75,8 +75,12 @@ function LoginPage() {
                 {/* Header */}
                 <div className="text-center space-y-2">
                     <div className="flex items-center justify-center">
-                        <div className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full">
-                            <Briefcase className="w-8 h-8 text-white" />
+                        <div className="p-3 rounded-full">
+                            <img
+                                src="/vaaman_logo.png"
+                                alt="Vaaman Logo"
+                                className="w-12 h-12 object-contain"
+                            />
                         </div>
                     </div>
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">

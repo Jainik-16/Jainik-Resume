@@ -10,6 +10,7 @@ export default function OfferListPage() {
     const [offers, setOffers] = useState<any[]>([])
     const [selectedOffer, setSelectedOffer] = useState<any>(null)
     const [loading, setLoading] = useState(false)
+    const [searchQuery, setSearchQuery] = useState("")
 
     const API_BASE_URL = "http://172.23.88.43:8000/api/method/resume.api.offer_letter"
 
@@ -52,6 +53,17 @@ export default function OfferListPage() {
             setLoading(false)
         }
     }
+    const filteredOffers = offers.filter((offer) => {
+        const searchLower = searchQuery.toLowerCase()
+        return (
+            searchQuery === "" ||
+            (offer.applicant_name || "").toLowerCase().includes(searchLower) ||
+            (offer.applicant_email || "").toLowerCase().includes(searchLower) ||
+            (offer.designation || "").toLowerCase().includes(searchLower) ||
+            (offer.company || "").toLowerCase().includes(searchLower) ||
+            (offer.name || "").toLowerCase().includes(searchLower)
+        )
+    })
 
     const getStatusColor = (status: string) => {
         const normalizedStatus = status?.toLowerCase() || ""
@@ -106,6 +118,30 @@ export default function OfferListPage() {
                     </div>
                 </div>
 
+                {/* Search Bar */}
+                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                    <CardContent className="p-6">
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by candidate name, email, position, company, or ID..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-12 pr-4 h-12 border-0 bg-slate-50 rounded-lg focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none text-slate-800 placeholder:text-slate-400"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery("")}
+                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                    ✕
+                                </button>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
                 {/* Main Content Card */}
                 <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
                     {!selectedOffer ? (
@@ -121,9 +157,9 @@ export default function OfferListPage() {
                                 </div>
                             </CardHeader>
                             <CardContent className="p-6">
-                                {offers.length > 0 ? (
+                                {filteredOffers.length > 0 ? (
                                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                        {offers.map((offer) => (
+                                        {filteredOffers.map((offer) => (
                                             <Card
                                                 key={offer.name}
                                                 className="group relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-0 shadow-lg bg-gradient-to-br from-white to-blue-50/30 cursor-pointer"
@@ -228,8 +264,23 @@ export default function OfferListPage() {
                                         <div className="inline-block p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full mb-6">
                                             <FileText className="h-16 w-16 text-blue-400" />
                                         </div>
-                                        <h3 className="text-xl font-semibold text-slate-800 mb-2">No Offers Found</h3>
-                                        <p className="text-slate-600">No job offers available yet. Check back later!</p>
+                                        <h3 className="text-xl font-semibold text-slate-800 mb-2">
+                                            {searchQuery ? "No Matching Offers Found" : "No Offers Found"}
+                                        </h3>
+                                        <p className="text-slate-600">
+                                            {searchQuery
+                                                ? `No offers match "${searchQuery}". Try a different search term.`
+                                                : "No job offers available yet. Check back later!"}
+                                        </p>
+                                        {searchQuery && (
+                                            <Button
+                                                onClick={() => setSearchQuery("")}
+                                                variant="outline"
+                                                className="mt-4"
+                                            >
+                                                Clear Search
+                                            </Button>
+                                        )}
                                     </div>
                                 )}
                             </CardContent>
