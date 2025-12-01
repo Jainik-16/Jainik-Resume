@@ -5,6 +5,13 @@ app_description = "For automate job Applicant Creation"
 app_email = "ptpratul2@gmail.com"
 app_license = "mit"
 
+
+# Ignore CSRF validation for these methods
+ignore_csrf = [
+    "resume.api.job_opening.create_job_opening",
+    "resume.api.upload_and_process.upload_and_process"
+]
+
 # Apps
 # ------------------
 
