@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -65,7 +65,7 @@ interface ColumnConfig {
   width: number
 }
 
-export default function CandidateFeedbackPage() {
+function CandidateFeedbackForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -1518,5 +1518,19 @@ export default function CandidateFeedbackPage() {
 
       <ColumnConfigModal />
     </div>
+  )
+}
+export default function CandidateFeedbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <CandidateFeedbackForm />
+    </Suspense>
   )
 }
