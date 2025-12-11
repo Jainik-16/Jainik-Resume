@@ -30,6 +30,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { API_BASE_URL } from '@/lib/api-config'
 
 interface JobOpening {
   name: string
@@ -52,18 +53,57 @@ export default function ResumeUploader() {
   const { toast } = useToast()
   const router = useRouter()
 
+  // useEffect(() => {
+  //   async function fetchJobs() {
+  //     try {
+  //       const res = await axios.get(
+  //         `${API_BASE_URL}/api/resource/Job Opening?fields=["name","job_title","designation","company","location","department"]`,
+  //         axiosConfig,
+  //       )
+  //       setJobs(res.data.data)
+
+  //       toast({
+  //         title: "Job Openings Loaded",
+  //         description: `Found ${res.data.data.length} active job openings.`,
+  //         duration: 3000,
+  //       })
+  //     } catch (err) {
+  //       console.error("Failed to fetch jobs", err)
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Failed to Load Jobs",
+  //         description: "Could not fetch job openings. Please refresh the page.",
+  //         duration: 5000,
+  //       })
+  //     }
+  //   }
+  //   fetchJobs()
+  // }, [toast])
   useEffect(() => {
     async function fetchJobs() {
       try {
-        const res = await axios.get(
-          'http://172.23.88.43:8000/api/resource/Job Opening?fields=["name","job_title","designation","company","location","department"]',
-          axiosConfig,
+        const res = await fetch(
+          `${API_BASE_URL}/api/resource/Job Opening?fields=["name","job_title","designation","company","location","department"]`,
+          {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            }
+          }
         )
-        setJobs(res.data.data)
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`)
+        }
+
+        const data = await res.json()
+        setJobs(data.data)
 
         toast({
           title: "Job Openings Loaded",
-          description: `Found ${res.data.data.length} active job openings.`,
+          description: `Found ${data.data.length} active job openings.`,
           duration: 3000,
         })
       } catch (err) {
@@ -216,30 +256,69 @@ export default function ResumeUploader() {
       const successfulUploads: string[] = []
       const failedUploads: string[] = []
 
+      // for (let i = 0; i < files.length; i++) {
+      //   const file = files[i]
+      //   try {
+      //     const formData = new FormData()
+      //     formData.append("files", file)
+      //     formData.append("job_opening", selectedJobId)
+      //     // await axios.post("http://localhost:8000/api/method/resume.api.upload_and_process", formData, API_AUTH)
+      //     await axios.post(`${API_BASE_URL}/api/method/resume.api.upload_and_process.upload_and_process`, formData, axiosConfigMultipart)
+      //     successfulUploads.push(file.name)
+      //     setProcessedFiles((prev) => [...prev, file.name])
+
+      //     const progress = ((i + 1) / files.length) * 100
+      //     setUploadProgress(progress)
+
+      //     // Show progress toast for each file
+      //     toast({
+      //       title: `Processing ${file.name}`,
+      //       description: `File ${i + 1} of ${files.length} processed successfully.`,
+      //       duration: 2000,
+      //     })
+
+      //     //navigation
+
+
+      //   } catch (fileError) {
+      //     console.error(`Failed to upload ${file.name}:`, fileError)
+      //     failedUploads.push(file.name)
+      //   }
+      // }
       for (let i = 0; i < files.length; i++) {
         const file = files[i]
         try {
           const formData = new FormData()
           formData.append("files", file)
           formData.append("job_opening", selectedJobId)
-          // await axios.post("http://localhost:8000/api/method/resume.api.upload_and_process", formData, API_AUTH)
-          await axios.post("http://172.23.88.43:8000/api/method/resume.api.upload_and_process.upload_and_process", formData, axiosConfigMultipart)
+
+          const res = await fetch(
+            `${API_BASE_URL}/api/method/resume.api.upload_and_process.upload_and_process`,
+            {
+              method: 'POST',
+              credentials: 'include',
+              body: formData,
+              // Note: Don't set Content-Type header for FormData, browser sets it automatically with boundary
+            }
+          )
+
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`)
+          }
+
+          await res.json()
+
           successfulUploads.push(file.name)
           setProcessedFiles((prev) => [...prev, file.name])
 
           const progress = ((i + 1) / files.length) * 100
           setUploadProgress(progress)
 
-          // Show progress toast for each file
           toast({
             title: `Processing ${file.name}`,
             description: `File ${i + 1} of ${files.length} processed successfully.`,
             duration: 2000,
           })
-
-          //navigation
-
-
         } catch (fileError) {
           console.error(`Failed to upload ${file.name}:`, fileError)
           failedUploads.push(file.name)

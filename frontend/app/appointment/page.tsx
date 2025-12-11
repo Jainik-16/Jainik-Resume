@@ -27,6 +27,7 @@ import {
 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
+
 interface AcceptedCandidate {
   name: string
   applicant_name: string

@@ -30,6 +30,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { axiosConfig } from '@/lib/axios-config'
+import { API_BASE_URL } from '@/lib/api-config'
+import { csrfToken } from '@/lib/csrf-cookies';
 
 // export const API_AUTH = {
 //   headers: {
@@ -75,25 +77,102 @@ export default function CreateJobOpeningForm() {
     { id: 4, title: "Compensation", icon: <DollarSign className="h-5 w-5" /> },
   ]
 
+  // useEffect(() => {
+  //   async function fetchOptions() {
+  //     try {
+  //       const [companies, departments, employment_types, designations, locations] = await Promise.all([
+  //         axios.get(` ${API_BASE_URL}/api/resource/Company?fields=["name"]`, axiosConfig),
+  //         axios.get(` ${API_BASE_URL}/api/resource/Department?fields=["name"]`, axiosConfig),
+  //         axios.get(` ${API_BASE_URL}/api/resource/Employment Type?fields=["name"]`, axiosConfig),
+  //         axios.get(` ${API_BASE_URL}/api/resource/Designation?fields=["name"]`, axiosConfig),
+  //         axios.get(` ${API_BASE_URL}/api/resource/Location?fields=["name"]`, axiosConfig),
+  //       ])
+  //       setOptions({
+  //         companies: companies.data.data.map((d: any) => d.name),
+  //         departments: departments.data.data.map((d: any) => d.name),
+  //         employment_types: employment_types.data.data.map((d: any) => d.name),
+  //         designations: designations.data.data.map((d: any) => d.name),
+  //         locations: locations.data.data.map((d: any) => d.name),
+  //       })
+
+  //       // Success toast for loading data
+  //       toast({
+  //         title: "Data Loaded Successfully",
+  //         description: "All dropdown options have been loaded.",
+  //         duration: 3000,
+  //       })
+  //     } catch (err) {
+  //       console.error("Error fetching dropdowns", err)
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Failed to Load Data",
+  //         description: "Could not load dropdown options. Please refresh the page.",
+  //         duration: 5000,
+  //       })
+  //     }
+  //   }
+  //   fetchOptions()
+  // }, [toast])
   useEffect(() => {
     async function fetchOptions() {
       try {
-        const [companies, departments, employment_types, designations, locations] = await Promise.all([
-          axios.get(' http://172.23.88.43:8000/api/resource/Company?fields=["name"]', axiosConfig),
-          axios.get(' http://172.23.88.43:8000/api/resource/Department?fields=["name"]', axiosConfig),
-          axios.get(' http://172.23.88.43:8000/api/resource/Employment Type?fields=["name"]', axiosConfig),
-          axios.get(' http://172.23.88.43:8000/api/resource/Designation?fields=["name"]', axiosConfig),
-          axios.get(' http://172.23.88.43:8000/api/resource/Location?fields=["name"]', axiosConfig),
+        const [companiesRes, departmentsRes, employmentTypesRes, designationsRes, locationsRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/resource/Company?fields=["name"]`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            }
+          }),
+          fetch(`${API_BASE_URL}/api/resource/Department?fields=["name"]`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            }
+          }),
+          fetch(`${API_BASE_URL}/api/resource/Employment Type?fields=["name"]`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            }
+          }),
+          fetch(`${API_BASE_URL}/api/resource/Designation?fields=["name"]`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            }
+          }),
+          fetch(`${API_BASE_URL}/api/resource/Location?fields=["name"]`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            }
+          }),
         ])
+
+        const companies = await companiesRes.json()
+        const departments = await departmentsRes.json()
+        const employment_types = await employmentTypesRes.json()
+        const designations = await designationsRes.json()
+        const locations = await locationsRes.json()
+
         setOptions({
-          companies: companies.data.data.map((d: any) => d.name),
-          departments: departments.data.data.map((d: any) => d.name),
-          employment_types: employment_types.data.data.map((d: any) => d.name),
-          designations: designations.data.data.map((d: any) => d.name),
-          locations: locations.data.data.map((d: any) => d.name),
+          companies: companies.data.map((d: any) => d.name),
+          departments: departments.data.map((d: any) => d.name),
+          employment_types: employment_types.data.map((d: any) => d.name),
+          designations: designations.data.map((d: any) => d.name),
+          locations: locations.data.map((d: any) => d.name),
         })
 
-        // Success toast for loading data
         toast({
           title: "Data Loaded Successfully",
           description: "All dropdown options have been loaded.",
@@ -236,6 +315,127 @@ export default function CreateJobOpeningForm() {
       })
     }
   }
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault()
+
+  //   if (!validateStep(currentStep)) {
+  //     return
+  //   }
+
+  //   setLoading(true)
+
+  //   toast({
+  //     title: "Creating Job Opening",
+  //     description: "Please wait while we process your request...",
+  //     duration: 2000,
+  //   })
+
+  //   // const payload = {
+  //   //   ...formData,
+  //   //   lower_range: formData.lower_range ? Number.parseFloat(formData.lower_range) : undefined,
+  //   //   upper_range: formData.upper_range ? Number.parseFloat(formData.upper_range) : undefined,
+  //   //   status: formData.status,
+  //   //   salary_per: formData.salary_per,
+  //   // }
+  //   const payload = {
+  //     ...formData,
+  //     lower_range: formData.lower_range ? Number.parseFloat(formData.lower_range) : undefined,
+  //     upper_range: formData.upper_range ? Number.parseFloat(formData.upper_range) : undefined,
+  //     closes_on: formData.closes_on || undefined, // Add this line - don't send empty string
+  //     status: formData.status,
+  //     salary_per: formData.salary_per,
+  //   }
+
+  //   try {
+  //     const res = await axios.post(
+  //       `${API_BASE_URL}/api/method/resume.api.job_opening.create_job_opening`,
+  //       payload,
+  //       axiosConfig,
+  //     )
+
+  //     console.log("API Response:", res.data)
+
+  //     // Check if backend returned an error
+  //     if (res.data?.message?.success === false) {
+  //       throw new Error(res.data.message.message || "Failed to create job opening")
+  //     }
+
+  //     if (res.data?.success === false) {
+  //       throw new Error(res.data.message || "Failed to create job opening")
+  //     }
+
+  //     // Success!
+  //     toast({
+  //       title: "🎉 Job Opening Created Successfully!",
+  //       description: `"${formData.job_title}" has been posted and is now live.`,
+  //       duration: 6000,
+  //       className: "bg-green-50 border-green-200",
+  //     })
+
+  //     // Reset form
+  //     setFormData({
+  //       job_title: "",
+  //       designation: "",
+  //       description: "",
+  //       currency: "INR",
+  //       lower_range: "",
+  //       upper_range: "",
+  //       publish_salary_range: false,
+  //       company: "",
+  //       employment_type: "",
+  //       department: "",
+  //       location: "",
+  //       publish_on_website: false,
+  //       posted_on: new Date().toISOString().split("T")[0],
+  //       closes_on: "",
+  //       status: "Open",
+  //       salary_per: "Month",
+  //     })
+
+  //     setCurrentStep(1)
+
+  //     setTimeout(() => {
+  //       toast({
+  //         title: "What's Next?",
+  //         description: "You can now start collecting resumes for this position.",
+  //         duration: 4000,
+  //       })
+  //     }, 2000)
+  //   } catch (err: any) {
+  //     console.error("Create job failed:", err)
+  //     console.error("Error response:", err.response?.data)
+
+  //     let errorMessage = "An unexpected error occurred while creating the job opening."
+
+  //     if (err.response?.data?.message) {
+  //       if (typeof err.response.data.message === 'object' && err.response.data.message.message) {
+  //         errorMessage = err.response.data.message.message
+  //       } else if (typeof err.response.data.message === 'string') {
+  //         errorMessage = err.response.data.message
+  //       }
+  //     } else if (err.message) {
+  //       errorMessage = err.message
+  //     }
+
+  //     toast({
+  //       variant: "destructive",
+  //       title: "❌ Failed to Create Job Opening",
+  //       description: errorMessage,
+  //       duration: 8000,
+  //     })
+
+  //     if (err.response?.status === 401) {
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Authentication Error",
+  //         description: "Your session may have expired. Please refresh the page.",
+  //         duration: 6000,
+  //       })
+  //     }
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -251,41 +451,45 @@ export default function CreateJobOpeningForm() {
       duration: 2000,
     })
 
-    // const payload = {
-    //   ...formData,
-    //   lower_range: formData.lower_range ? Number.parseFloat(formData.lower_range) : undefined,
-    //   upper_range: formData.upper_range ? Number.parseFloat(formData.upper_range) : undefined,
-    //   status: formData.status,
-    //   salary_per: formData.salary_per,
-    // }
     const payload = {
       ...formData,
       lower_range: formData.lower_range ? Number.parseFloat(formData.lower_range) : undefined,
       upper_range: formData.upper_range ? Number.parseFloat(formData.upper_range) : undefined,
-      closes_on: formData.closes_on || undefined, // Add this line - don't send empty string
+      closes_on: formData.closes_on || undefined,
       status: formData.status,
       salary_per: formData.salary_per,
     }
 
     try {
-      const res = await axios.post(
-        "http://172.23.88.43:8000/api/method/resume.api.job_opening.create_job_opening",
-        payload,
-        axiosConfig,
+      const res = await fetch(
+        `${API_BASE_URL}/api/method/resume.api.job_opening.create_job_opening`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        }
       )
 
-      console.log("API Response:", res.data)
-
-      // Check if backend returned an error
-      if (res.data?.message?.success === false) {
-        throw new Error(res.data.message.message || "Failed to create job opening")
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`)
       }
 
-      if (res.data?.success === false) {
-        throw new Error(res.data.message || "Failed to create job opening")
+      const data = await res.json()
+
+      console.log("API Response:", data)
+
+      if (data?.message?.success === false) {
+        throw new Error(data.message.message || "Failed to create job opening")
       }
 
-      // Success!
+      if (data?.success === false) {
+        throw new Error(data.message || "Failed to create job opening")
+      }
+
       toast({
         title: "🎉 Job Opening Created Successfully!",
         description: `"${formData.job_title}" has been posted and is now live.`,
@@ -293,7 +497,6 @@ export default function CreateJobOpeningForm() {
         className: "bg-green-50 border-green-200",
       })
 
-      // Reset form
       setFormData({
         job_title: "",
         designation: "",
@@ -324,17 +527,10 @@ export default function CreateJobOpeningForm() {
       }, 2000)
     } catch (err: any) {
       console.error("Create job failed:", err)
-      console.error("Error response:", err.response?.data)
 
       let errorMessage = "An unexpected error occurred while creating the job opening."
 
-      if (err.response?.data?.message) {
-        if (typeof err.response.data.message === 'object' && err.response.data.message.message) {
-          errorMessage = err.response.data.message.message
-        } else if (typeof err.response.data.message === 'string') {
-          errorMessage = err.response.data.message
-        }
-      } else if (err.message) {
+      if (err.message) {
         errorMessage = err.message
       }
 
@@ -344,15 +540,6 @@ export default function CreateJobOpeningForm() {
         description: errorMessage,
         duration: 8000,
       })
-
-      if (err.response?.status === 401) {
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "Your session may have expired. Please refresh the page.",
-          duration: 6000,
-        })
-      }
     } finally {
       setLoading(false)
     }

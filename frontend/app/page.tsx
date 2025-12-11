@@ -27,6 +27,9 @@ import {
   LogOut,
 } from "lucide-react"
 import Link from "next/link"
+import { API_BASE_URL } from '@/lib/api-config'
+import { csrfToken } from '@/lib/csrf-cookies';
+import { deleteCookie } from "cookies-next";
 
 interface WorkflowStep {
   id: string
@@ -43,12 +46,16 @@ export default function RecruitmentDashboard() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
   const [workflowProgress, setWorkflowProgress] = useState(0)
 
+
   const handleLogout = async () => {
-    const LOGOUT_URL = `http://172.23.88.43:8000/api/method/logout`;
+    const LOGOUT_URL = `${API_BASE_URL}/api/method/logout`;
+
+
     const response = await fetch(LOGOUT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        // 'X-Frappe-CSRF-Token': csrfToken,
       },
 
     });

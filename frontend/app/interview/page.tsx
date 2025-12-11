@@ -30,6 +30,8 @@ import Link from "next/link"
 // import { API_AUTH } from "../create-job/page"
 import { axiosConfig } from '@/lib/axios-config'
 import { useRouter } from "next/navigation"
+import { API_BASE_URL } from '@/lib/api-config'
+
 
 interface Candidate {
   id: string
@@ -80,31 +82,130 @@ export default function InterviewPage() {
     "Alex Kumar - Product Manager",
   ])
 
+  // const fetchJobApplicant = async () => {
+  //   setIsLoading(true)
+  //   setApiError(null)
+  //   try {
+  //     const applicantsResponse = await axios.get(
+  //       `${API_BASE_URL}/api/resource/Job Applicant/?fields=["*"]`,
+  //       {
+  //         ...axiosConfig,
+  //         timeout: 10000,
+  //       }
+  //     );
+
+  //     const interviewsResponse = await axios.get(
+  //       `${API_BASE_URL}/api/resource/Interview/?fields=["*"]`,
+  //       {
+  //         ...axiosConfig,
+  //         timeout: 10000,
+  //       }
+  //     );
+
+  //     console.log("API Response:", applicantsResponse.data);
+
+  //     if (applicantsResponse.data && applicantsResponse.data.data) {
+  //       const applicants = applicantsResponse.data.data;
+  //       const interviews = interviewsResponse.data.data || [];
+
+  //       // Map the API data and add interview status
+  //       const mappedData = applicants.map((item: any) => {
+  //         // Find matching interview by job_applicant field
+  //         const interview = interviews.find((int: any) =>
+  //           int.job_applicant === item.name || int.job_applicant === item.email_id
+  //         );
+
+  //         return {
+  //           id: item.name || item.id,
+  //           applicant_name: item.applicant_name || "Unknown",
+  //           email_id: item.email_id || "",
+  //           phone_number: item.phone_number || "",
+  //           position: item.job_title || item.designation || "Not specified",
+  //           designation: item.designation || "",
+  //           experience: item.experience || "N/A",
+  //           skills: item.skills ? (Array.isArray(item.skills) ? item.skills : []) : [],
+  //           resumeScore: item.resume_score || 0,
+  //           status: item.status || "Open",
+  //           interviewStatus: interview ? interview.status : null,
+  //           appliedDate: item.creation || item.applied_date || new Date().toISOString().split('T')[0],
+  //           interviewDetails: interview ? {
+  //             date: interview.date || "",
+  //             time: interview.time || "",
+  //             type: interview.type || "video",
+  //             location: interview.location,
+  //             interviewers: interview.interviewers || [],
+  //             round: interview.round || 1,
+  //             notes: interview.notes || ""
+  //           } : undefined
+  //         };
+  //       });
+
+  //       setCandidate(mappedData);
+  //       console.log("Mapped candidates:", mappedData);
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error fetching job applicants:", error);
+
+  //     if (error.response) {
+  //       console.error("Response error:", error.response.status, error.response.data);
+  //       setApiError(`Server error: ${error.response.status}`);
+  //     } else if (error.request) {
+  //       console.error("No response received:", error.request);
+  //       setApiError("Network error: Unable to reach server. Please check if the API server is running.");
+  //     } else {
+  //       console.error("Request setup error:", error.message);
+  //       setApiError(`Request error: ${error.message}`);
+  //     }
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // };
+
+
   const fetchJobApplicant = async () => {
     setIsLoading(true)
     setApiError(null)
     try {
-      const applicantsResponse = await axios.get(
-        `http://172.23.88.43:8000/api/resource/Job Applicant/?fields=["*"]`,
+      const applicantsRes = await fetch(
+        `${API_BASE_URL}/api/resource/Job Applicant/?fields=["*"]`,
         {
-          ...axiosConfig,
-          timeout: 10000,
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
         }
       );
 
-      const interviewsResponse = await axios.get(
-        `http://172.23.88.43:8000/api/resource/Interview/?fields=["*"]`,
+      const interviewsRes = await fetch(
+        `${API_BASE_URL}/api/resource/Interview/?fields=["*"]`,
         {
-          ...axiosConfig,
-          timeout: 10000,
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
         }
       );
 
-      console.log("API Response:", applicantsResponse.data);
+      if (!applicantsRes.ok) {
+        throw new Error(`HTTP error! status: ${applicantsRes.status}`)
+      }
 
-      if (applicantsResponse.data && applicantsResponse.data.data) {
-        const applicants = applicantsResponse.data.data;
-        const interviews = interviewsResponse.data.data || [];
+      if (!interviewsRes.ok) {
+        throw new Error(`HTTP error! status: ${interviewsRes.status}`)
+      }
+
+      const applicantsData = await applicantsRes.json();
+      const interviewsData = await interviewsRes.json();
+
+      console.log("API Response:", applicantsData);
+
+      if (applicantsData && applicantsData.data) {
+        const applicants = applicantsData.data;
+        const interviews = interviewsData.data || [];
 
         // Map the API data and add interview status
         const mappedData = applicants.map((item: any) => {
@@ -143,22 +244,11 @@ export default function InterviewPage() {
       }
     } catch (error: any) {
       console.error("Error fetching job applicants:", error);
-
-      if (error.response) {
-        console.error("Response error:", error.response.status, error.response.data);
-        setApiError(`Server error: ${error.response.status}`);
-      } else if (error.request) {
-        console.error("No response received:", error.request);
-        setApiError("Network error: Unable to reach server. Please check if the API server is running.");
-      } else {
-        console.error("Request setup error:", error.message);
-        setApiError(`Request error: ${error.message}`);
-      }
+      setApiError("Network error: Unable to reach server. Please check if the API server is running.");
     } finally {
       setIsLoading(false)
     }
   };
-
   useEffect(() => {
     fetchJobApplicant()
   }, [])

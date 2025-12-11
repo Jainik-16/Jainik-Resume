@@ -14,6 +14,7 @@ import {
     X,
     ChevronDown
 } from "lucide-react"
+import { API_BASE_URL } from '@/lib/api-config'
 
 interface JobOpening {
     name: string
@@ -50,7 +51,7 @@ export default function JobOpeningList() {
         setLoading(true)
         try {
             const response = await fetch(
-                'http://172.23.88.43:8000/api/resource/Job Opening?fields=["*"]&limit_page_length=999',
+                `${API_BASE_URL}/api/resource/Job Opening?fields=["*"]&limit_page_length=999`,
                 {
                     method: "GET",
                     credentials: "include",

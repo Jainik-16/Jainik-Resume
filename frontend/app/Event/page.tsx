@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowLeft, Calendar, Clock, MapPin, Video, FileText, Users, CheckCircle2, AlertCircle } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { API_BASE_URL } from '@/lib/api-config'
+import { getCookie } from "cookies-next";
+
 
 interface Interviewer {
   name: string
@@ -23,6 +26,11 @@ interface InterviewRound {
 
 interface Location {
   name: string
+}
+
+interface InterviewLink {
+  name: string
+  link: string
 }
 
 function EventPageContent() {
@@ -57,6 +65,7 @@ function EventPageContent() {
   const [availableInterviewers, setAvailableInterviewers] = useState<Interviewer[]>([])
   const [interviewRounds, setInterviewRounds] = useState<InterviewRound[]>([])
   const [locations, setLocations] = useState<Location[]>([])
+  const [interviewLinks, setInterviewLinks] = useState<InterviewLink[]>([])
   const [isSaving, setIsSaving] = useState(false)
 
   const statusOptions = ["Pending", "Under Review", "Cleared", "Rejected"]
@@ -65,12 +74,39 @@ function EventPageContent() {
     fetchInterviewers()
     fetchInterviewRounds()
     fetchLocations()
+    fetchInterviewLinks()
   }, [])
+
+  const fetchInterviewLinks = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/resource/Interview Link?fields=["name","google_meet"]&limit_page_length=100`,
+        {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      const data = await response.json()
+      if (data && data.data) {
+        // Map google_meet to link for consistency
+        const mappedLinks = data.data.map((item: any) => ({
+          name: item.name,
+          link: item.google_meet
+        }))
+        setInterviewLinks(mappedLinks)
+        console.log("Fetched interview links:", mappedLinks)
+      }
+    } catch (error) {
+      console.error("Error fetching interview links:", error)
+    }
+  }
 
   const fetchLocations = async () => {
     try {
       const response = await fetch(
-        `http://172.23.88.43:8000/api/resource/Location?fields=["name"]&limit_page_length=100`,
+        `${API_BASE_URL}/api/resource/Location?fields=["name"]&limit_page_length=100`,
         {
           credentials: 'include',
           headers: {
@@ -91,7 +127,7 @@ function EventPageContent() {
   const fetchInterviewRounds = async () => {
     try {
       const response = await fetch(
-        `http://172.23.88.43:8000/api/resource/Interview Round?fields=["name","round_name"]&limit_page_length=100`,
+        `${API_BASE_URL}/api/resource/Interview Round?fields=["name","round_name"]&limit_page_length=100`,
         {
           credentials: 'include',
           headers: {
@@ -117,7 +153,7 @@ function EventPageContent() {
   const fetchInterviewers = async () => {
     try {
       const response = await fetch(
-        `http://172.23.88.43:8000/api/resource/User?fields=["name","full_name","email"]&filters=[["enabled","=",1]]&limit_page_length=100`,
+        `${API_BASE_URL}/api/resource/User?fields=["name","full_name","email"]&filters=[["enabled","=",1]]&limit_page_length=100`,
         {
           credentials: 'include',
           headers: {
@@ -177,15 +213,21 @@ function EventPageContent() {
       };
 
       console.log("Interview data:", JSON.stringify(interviewData, null, 2));
-
+      // await fetch(`${API_BASE_URL}/api/method/frappe.auth.get_logged_user`, {
+      //   credentials: "include"
+      // });
+      // await new Promise(res => setTimeout(res, 50));
+      const csrfToken = (getCookie("csrf_token") as string) || "";
       const response = await fetch(
-        `http://172.23.88.43:8000/api/resource/Interview`,
+        `${API_BASE_URL}/api/resource/Interview`,
         {
           method: 'POST',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            // "X-Frappe-CSRF-Token": getCookie("csrf_token")
+            "X-Frappe-CSRF-Token": csrfToken
+
           },
           body: JSON.stringify(interviewData)
         }
@@ -351,13 +393,31 @@ function EventPageContent() {
                   <Video className="h-4 w-4 text-blue-500" />
                   Meeting Link
                 </Label>
-                <Input
-                  type="url"
-                  value={eventForm.meetingLink}
-                  onChange={(e) => setEventForm({ ...eventForm, meetingLink: e.target.value })}
-                  placeholder="https://zoom.us/j/123456789 or Google Meet link"
-                  className="h-11 shadow-sm"
-                />
+                {interviewLinks.length > 0 ? (
+                  <Select
+                    value={eventForm.meetingLink}
+                    onValueChange={(value) => setEventForm({ ...eventForm, meetingLink: value })}
+                  >
+                    <SelectTrigger className="h-11 shadow-sm">
+                      <SelectValue placeholder="Select meeting link" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {interviewLinks.map((link) => (
+                        <SelectItem key={link.name} value={link.link}>
+                          {link.link}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    value={eventForm.meetingLink}
+                    onChange={(e) => setEventForm({ ...eventForm, meetingLink: e.target.value })}
+                    placeholder="Loading meeting links..."
+                    className="h-11 shadow-sm"
+                    disabled
+                  />
+                )}
               </div>
 
               <div className="space-y-2">
