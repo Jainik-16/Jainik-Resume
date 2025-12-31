@@ -45,7 +45,7 @@ def create_interview_event():
             "interview_round": data.interview_round,
             "job_applicant": data.job_applicant,
             "resume_link": data.get("resume_link"),
-            "custom_meeting_link": data.get("meeting_link"),
+            "google_meet": data.get("meeting_link"),
             "custom_location": location,
             "status": status,
             "scheduled_on": data.scheduled_on,
@@ -87,7 +87,7 @@ def get_interview_list():
                 "interview_round",
                 "job_applicant",
                 "resume_link",
-                "custom_meeting_link",
+                "google_meet",
                 "custom_location",
                 "status",
                 "scheduled_on",
@@ -109,9 +109,9 @@ def get_interview_list():
             )
             interview["interviewers"] = [i.interviewer for i in interviewers]
             
-            # Map custom fields to standard names for frontend
-            if "custom_meeting_link" in interview:
-                interview["meeting_link"] = interview.get("custom_meeting_link")
+            # Map google_meet to meeting_link for frontend
+            if "google_meet" in interview:
+                interview["meeting_link"] = interview.get("google_meet")
             if "custom_location" in interview:
                 interview["location"] = interview.get("custom_location")
         
@@ -144,9 +144,9 @@ def get_interview_details(interview_name):
         interview_dict = interview.as_dict()
         interview_dict["interviewers"] = [i.interviewer for i in interviewers]
         
-        # Map custom fields to standard names for frontend
-        if hasattr(interview, 'custom_meeting_link'):
-            interview_dict["meeting_link"] = interview.custom_meeting_link
+        # Map google_meet to meeting_link for frontend
+        if hasattr(interview, 'google_meet'):
+            interview_dict["meeting_link"] = interview.google_meet
         if hasattr(interview, 'custom_location'):
             interview_dict["location"] = interview.custom_location
         
@@ -181,7 +181,7 @@ def update_interview_event():
         if data.get("resume_link"):
             interview_doc.resume_link = data.resume_link
         if data.get("meeting_link"):
-            interview_doc.custom_meeting_link = data.meeting_link
+            interview_doc.google_meet = data.meeting_link
         if data.get("location"):
             interview_doc.custom_location = data.location
         if data.get("status"):
@@ -299,4 +299,5 @@ def get_interview_rounds():
     except Exception as e:
         frappe.log_error(frappe.get_traceback(), "Interview Rounds Fetch Failed")
         frappe.throw("Failed to fetch interview rounds")
+
         

@@ -6,11 +6,15 @@ app_email = "ptpratul2@gmail.com"
 app_license = "mit"
 
 
-# Ignore CSRF validation for these methods
-ignore_csrf = [
-    "resume.api.job_opening.create_job_opening",
-    "resume.api.upload_and_process.upload_and_process"
-]
+# # Ignore CSRF validation for these methods
+# ignore_csrf = [
+#     "resume.api.job_opening.create_job_opening",
+#     "resume.api.upload_and_process.upload_and_process"
+# ]
+# CSRF Token Exemptions
+
+
+
 
 # Apps
 # ------------------
@@ -182,7 +186,7 @@ ignore_csrf = [
 # ------------------------------
 #
 # override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "resume.event.get_events"
+# 	 "frappe.desk.doctype.event.event.get_events": "resume.event.get_events"
 # }
 #
 # each overriding function accepts a `data` argument;
